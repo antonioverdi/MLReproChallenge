@@ -53,6 +53,7 @@ parser.add_argument('--save-dir', dest='save_dir',
 parser.add_argument('--save-every', dest='save_every',
                     help='Saves checkpoints at every specified number of epochs',
                     type=int, default=10)
+parser.add_argument('--colab', action="store_true", help="set true to avoid moving model to Cuda")
 best_prec1 = 0
 
 
@@ -66,7 +67,8 @@ def main():
         os.makedirs(args.save_dir)
 
     model = torch.nn.DataParallel(resnet.__dict__[args.arch]())
-    model.cuda()
+    if not args.colab:
+    	model.cuda()
 
     # optionally resume from a checkpoint
     if args.resume:
@@ -81,6 +83,7 @@ def main():
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 
+    # if not args.colab:
     cudnn.benchmark = True
 
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -123,18 +126,18 @@ def main():
 
 
     if args.evaluate:
-        validate(val_loader, model, criterion)
+        validate(val_loader, model, criterion, args.colab)
         return
 
     for epoch in range(args.start_epoch, args.epochs):
 
         # train for one epoch
         print('current lr {:.5e}'.format(optimizer.param_groups[0]['lr']))
-        train(train_loader, model, criterion, optimizer, epoch)
+        train(train_loader, model, criterion, optimizer, epoch, args.colab)
         lr_scheduler.step()
 
         # evaluate on validation set
-        prec1 = validate(val_loader, model, criterion)
+        prec1 = validate(val_loader, model, criterion, args.colab)
 
         # remember best prec@1 and save checkpoint
         is_best = prec1 > best_prec1
@@ -153,7 +156,7 @@ def main():
         }, is_best, filename=os.path.join(args.save_dir, 'model.th'))
 
 
-def train(train_loader, model, criterion, optimizer, epoch):
+def train(train_loader, model, criterion, optimizer, epoch, colab=False):
     """
         Run one train epoch
     """
@@ -171,8 +174,10 @@ def train(train_loader, model, criterion, optimizer, epoch):
         # measure data loading time
         data_time.update(time.time() - end)
 
-        target = target.cuda()
-        input_var = input.cuda()
+
+        if not colab:
+        	target = target.cuda()
+        	input_var = input.cuda()
         target_var = target
         if args.half:
             input_var = input_var.half()
@@ -207,7 +212,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
                       data_time=data_time, loss=losses, top1=top1))
 
 
-def validate(val_loader, model, criterion):
+def validate(val_loader, model, criterion, colab=False):
     """
     Run evaluation
     """
@@ -221,9 +226,10 @@ def validate(val_loader, model, criterion):
     end = time.time()
     with torch.no_grad():
         for i, (input, target) in enumerate(val_loader):
-            target = target.cuda()
-            input_var = input.cuda()
-            target_var = target.cuda()
+        	if not colab:
+            	target = target.cuda()
+            	input_var = input.cuda()
+            	target_var = target.cuda()
 
             if args.half:
                 input_var = input_var.half()
