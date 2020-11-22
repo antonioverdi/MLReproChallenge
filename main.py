@@ -176,9 +176,12 @@ def train(train_loader, model, criterion, optimizer, epoch, colab=False):
 		data_time.update(time.time() - end)
 
 
-		if not colab:
+		if colab:
+			input_var = input
+		else:
 			target = target.cuda()
 			input_var = input.cuda()
+
 		target_var = target
 		if args.half:
 			input_var = input_var.half()
@@ -227,10 +230,13 @@ def validate(val_loader, model, criterion, colab=False):
 	end = time.time()
 	with torch.no_grad():
 		for i, (input, target) in enumerate(val_loader):
-			if not colab:
+			if colab:
 				target = target.cuda()
 				input_var = input.cuda()
 				target_var = target.cuda()
+			else:
+				input_var = input
+				target_var = target
 
 			if args.half:
 				input_var = input_var.half()
