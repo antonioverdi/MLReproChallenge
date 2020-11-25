@@ -7,6 +7,7 @@ import torch.nn.init as init
 
 from torch.autograd import Variable
 from l0_layers import L0Conv2d
+from base_layers import MAPConv2d
 
 def _weights_init(m):
 	classname = m.__class__.__name__
@@ -55,20 +56,21 @@ class BasicBlock(nn.Module):
 		return out
 
 class L0Block(nn.Module):
+	expansion = 1
 
-	def __init__(self, in_planes, planes, stride=1, option='A'):
-		super(BasicBlock, self).__init__()
+	def __init__(self, in_planes, out_planes, stride=1, option='A', lamba=1., temperature=2./3.):
+		super(L0Block, self).__init__()
 		self.conv1 = L0Conv2d(in_planes, out_planes, kernel_size=3, stride=1, padding=1, bias=False,
-							  droprate_init=droprate_init, weight_decay=weight_decay / (1 - 0.3), local_rep=local_rep,
+							   weight_decay=1 / (1 - 0.3),
 							  lamba=lamba, temperature=temperature)
-		self.bn1 = nn.BatchNorm2d(planes)
+		self.bn1 = nn.BatchNorm2d(out_planes)
 		self.conv2 = MAPConv2d(out_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False,
-							   weight_decay=weight_decay)
-		self.bn2 = nn.BatchNorm2d(planes)
+							   weight_decay=1)
+		self.bn2 = nn.BatchNorm2d(out_planes)
 		self.equalInOut = (in_planes == out_planes)
 		self.convShortcut = (not self.equalInOut) and \
 							MAPConv2d(in_planes, out_planes, kernel_size=1, stride=stride, padding=0, bias=False,
-									  weight_decay=weight_decay) or None
+									  weight_decay=1) or None
 
 	def forward(self, x):
 		if not self.equalInOut:
