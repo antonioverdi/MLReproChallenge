@@ -7,11 +7,15 @@ import torch.nn.init as init
 
 from torch.autograd import Variable
 
-def _weights_init(m):
+def _weights_init(m, init_strat="kaiming"):
     classname = m.__class__.__name__
     #print(classname)
-    if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
-        init.kaiming_normal_(m.weight)
+    if init_strat == "kaiming":
+        if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
+            init.kaiming_normal_(m.weight)
+    elif init_strat == "xavier":
+        if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
+            init.xavier_normal_(m.weight)
 
 class LambdaLayer(nn.Module):
     def __init__(self, lambd):
