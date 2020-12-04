@@ -229,7 +229,7 @@ def validate(val_loader, model, criterion, colab=False):
 	end = time.time()
 	with torch.no_grad():
 		for i, (input, target) in enumerate(val_loader):
-			if colab:
+			if not colab:
 				target = target.cuda()
 				input_var = input.cuda()
 				target_var = target.cuda()
