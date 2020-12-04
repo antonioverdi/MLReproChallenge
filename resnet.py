@@ -7,15 +7,15 @@ import torch.nn.init as init
 
 from torch.autograd import Variable
 
-def _weights_init(m, init_strat="kaiming"):
+def _kaiming_weights_init(m):
     classname = m.__class__.__name__
-    #print(classname)
-    if init_strat == "kaiming":
-        if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
-            init.kaiming_normal_(m.weight)
-    elif init_strat == "xavier":
-        if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
-            init.xavier_normal_(m.weight)
+    if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
+        init.kaiming_normal_(m.weight)
+
+def _xavier_weights_init(m):
+    classname = m.__class__.__name__
+    if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
+        init.xavier_normal_(m.weight)
 
 class LambdaLayer(nn.Module):
     def __init__(self, lambd):
@@ -58,7 +58,7 @@ class BasicBlock(nn.Module):
         return out
 
 
-class ResNet(nn.Module):
+class ResNet(nn.Module, init_strat="kaiming"):
     def __init__(self, block, num_blocks, num_classes=10):
         super(ResNet, self).__init__()
         self.in_planes = 16
@@ -70,7 +70,10 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 64, num_blocks[2], stride=2)
         self.linear = nn.Linear(64, num_classes)
 
-        self.apply(_weights_init)
+        if init_strat == "kaiming":
+            self.apply(_kaiming_weights_init)
+        elif init_strat == "xavier":
+            self.apply(_xavier_weights_init)
 
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1]*(num_blocks-1)

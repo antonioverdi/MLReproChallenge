@@ -54,6 +54,7 @@ parser.add_argument('--save-every', dest='save_every',
 					help='Saves checkpoints at every specified number of epochs',
 					type=int, default=10)
 parser.add_argument('--colab', action="store_true", help="set true to avoid moving model to Cuda")
+parser.add_argument('--snip', action="store_true", help="will run SNIP experiments")
 best_prec1 = 0
 
 
