@@ -73,6 +73,9 @@ def main():
 
 
 	#we need data loader available for SNIP to get a batch
+	normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+									 std=[0.229, 0.224, 0.225])
+	
 	train_loader = torch.utils.data.DataLoader(
 		datasets.CIFAR10(root='./data', train=True, transform=transforms.Compose([
 			transforms.RandomHorizontalFlip(),
@@ -114,9 +117,6 @@ def main():
 
 	# if not args.colab:
 	cudnn.benchmark = True
-
-	normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-									 std=[0.229, 0.224, 0.225])
 
 	## Optimizer and LR scheduler
 	criterion = nn.CrossEntropyLoss()
