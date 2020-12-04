@@ -28,7 +28,8 @@ def snip_mask(model, batch, labels, compression):
 	#compute gradients of weight_mask (connections)
 	model.zero_grad()
 	out = model.forward(batch)
-	loss = F.nll_loss(out, labels)
+	loss_fn = F.CrossEntropyLoss().cuda()
+	loss = loss_fn(out, labels)
 	loss.backward()
 	
 	absolute_saliency = []

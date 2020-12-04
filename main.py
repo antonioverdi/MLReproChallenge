@@ -85,7 +85,7 @@ def main():
 			normalize,
 		]), download=True),
 		batch_size=args.batch_size, shuffle=True,
-		num_workers=args.workers, pin_memory=True)
+		num_workers=args.workers, pin_memory=(not args.colab))
 
 	val_loader = torch.utils.data.DataLoader(
 		datasets.CIFAR10(root='./data', train=False, transform=transforms.Compose([
@@ -93,15 +93,16 @@ def main():
 			normalize,
 		])),
 		batch_size=128, shuffle=False,
-		num_workers=args.workers, pin_memory=True)
+		num_workers=args.workers, pin_memory=(not args.colab))
 
+	if not args.colab:
+		model.cuda()
+		
 	if args.snip and (args.resume == ''):
 		batch, labels = next(iter(train_loader))
 		mask = snip_mask(model, batch, labels, args.snip_compression)
 		apply_snip(model, mask)
 
-	if not args.colab:
-		model.cuda()
 
 	# optionally resume from a checkpoint.
 	if args.resume:
