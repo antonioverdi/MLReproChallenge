@@ -150,6 +150,7 @@ def main():
 
 		# train for one epoch
 		print('current lr {:.5e}'.format(optimizer.param_groups[0]['lr']))
+		begin_time = time.time()
 		train(train_loader, model, criterion, optimizer, epoch, args.colab)
 		lr_scheduler.step()
 
@@ -165,12 +166,14 @@ def main():
 				'epoch': epoch + 1,
 				'state_dict': model.state_dict(),
 				'best_prec1': best_prec1,
-			}, is_best, filename=os.path.join(args.save_dir, 'checkpoint.th'))
+			}, filename=os.path.join(args.save_dir, 'checkpoint.th'))
 
-		save_checkpoint({
+		if is_best:
+			save_checkpoint({
 			'state_dict': model.state_dict(),
 			'best_prec1': best_prec1,
-		}, is_best, filename=os.path.join(args.save_dir, 'model.th'))
+			}, filename=os.path.join(args.save_dir, 'model.th'))
+		print("Epoch Total Time: {}".format(time.time() - begin_time))
 
 
 def train(train_loader, model, criterion, optimizer, epoch, colab=False):
@@ -286,7 +289,7 @@ def validate(val_loader, model, criterion, colab=False):
 
 	return top1.avg
 
-def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
+def save_checkpoint(state, filename='checkpoint.pth.tar'):
 	"""
 	Save the training model
 	"""
