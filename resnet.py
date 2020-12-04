@@ -58,8 +58,8 @@ class BasicBlock(nn.Module):
         return out
 
 
-class ResNet(nn.Module, init_strat="kaiming"):
-    def __init__(self, block, num_blocks, num_classes=10):
+class ResNet(nn.Module):
+    def __init__(self, block, num_blocks, num_classes=10, init_strat="kaiming"):
         super(ResNet, self).__init__()
         self.in_planes = 16
 
