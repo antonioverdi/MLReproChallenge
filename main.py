@@ -12,6 +12,7 @@ import torch.utils.data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import resnet
+from snip import snip_mask, apply_snip
 
 
 model_names = sorted(name for name in resnet.__dict__
@@ -75,7 +76,7 @@ def main():
 	#we need data loader available for SNIP to get a batch
 	normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
 									 std=[0.229, 0.224, 0.225])
-	
+
 	train_loader = torch.utils.data.DataLoader(
 		datasets.CIFAR10(root='./data', train=True, transform=transforms.Compose([
 			transforms.RandomHorizontalFlip(),
@@ -95,7 +96,7 @@ def main():
 		num_workers=args.workers, pin_memory=True)
 
 	if args.snip and (args.resume == ''):
-		batch, labels = next(train_loader)
+		batch, labels = next(iter(train_loader))
 		mask = snip_mask(model, batch, labels, args.snip_compression)
 		apply_snip(model, mask)
 
@@ -120,7 +121,7 @@ def main():
 
 	## Optimizer and LR scheduler
 	criterion = nn.CrossEntropyLoss()
-	if not colab:
+	if not args.colab:
 		criterion = nn.CrossEntropyLoss().cuda()
 	optimizer = optim.SGD(model.parameters(), lr=args.lr,
 					  momentum=args.momentum, weight_decay=args.weight_decay, nesterov=True)
