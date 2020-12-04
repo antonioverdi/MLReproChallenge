@@ -97,9 +97,11 @@ def main():
 
 	if not args.colab:
 		model.cuda()
-		
+
 	if args.snip and (args.resume == ''):
 		batch, labels = next(iter(train_loader))
+		batch = batch.cuda()
+		labels = labels.cuda()
 		mask = snip_mask(model, batch, labels, args.snip_compression)
 		apply_snip(model, mask)
 
