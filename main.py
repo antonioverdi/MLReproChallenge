@@ -56,6 +56,7 @@ parser.add_argument('--save-every', dest='save_every',
 					type=int, default=10)
 parser.add_argument('--colab', action="store_true", help="set true to avoid moving model to Cuda")
 parser.add_argument('--snip', action="store_true", help="will run SNIP experiments")
+parser.add_argument('--snip_compression', type=float, default=0.5, help="eg. a value of 0.25 will retain 25 percent of the weights")
 best_prec1 = 0
 
 
@@ -68,30 +69,10 @@ def main():
 		os.makedirs(args.save_dir)
 
 	model = torch.nn.DataParallel(resnet.__dict__[args.arch]())
-	if args.snip:
+	
 
-	if not args.colab:
-		model.cuda()
 
-	# optionally resume from a checkpoint
-	if args.resume:
-		if os.path.isfile(args.resume):
-			print("=> loading checkpoint '{}'".format(args.resume))
-			checkpoint = torch.load(args.resume)
-			args.start_epoch = checkpoint['epoch']
-			best_prec1 = checkpoint['best_prec1']
-			model.load_state_dict(checkpoint['state_dict'])
-			print("=> loaded checkpoint '{}' (epoch {})"
-				  .format(args.evaluate, checkpoint['epoch']))
-		else:
-			print("=> no checkpoint found at '{}'".format(args.resume))
-
-	# if not args.colab:
-	cudnn.benchmark = True
-
-	normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-									 std=[0.229, 0.224, 0.225])
-
+	#we need data loader available for SNIP to get a batch
 	train_loader = torch.utils.data.DataLoader(
 		datasets.CIFAR10(root='./data', train=True, transform=transforms.Compose([
 			transforms.RandomHorizontalFlip(),
@@ -110,8 +91,37 @@ def main():
 		batch_size=128, shuffle=False,
 		num_workers=args.workers, pin_memory=True)
 
+	if args.snip and (args.resume == ''):
+		batch, labels = next(train_loader)
+		mask = snip_mask(model, batch, labels, args.snip_compression)
+		apply_snip(model, mask)
+
+	if not args.colab:
+		model.cuda()
+
+	# optionally resume from a checkpoint.
+	if args.resume:
+		if os.path.isfile(args.resume):
+			print("=> loading checkpoint '{}'".format(args.resume))
+			checkpoint = torch.load(args.resume)
+			args.start_epoch = checkpoint['epoch']
+			best_prec1 = checkpoint['best_prec1']
+			model.load_state_dict(checkpoint['state_dict'])
+			print("=> loaded checkpoint '{}' (epoch {})"
+				  .format(args.evaluate, checkpoint['epoch']))
+		else:
+			print("=> no checkpoint found at '{}'".format(args.resume))
+
+	# if not args.colab:
+	cudnn.benchmark = True
+
+	normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+									 std=[0.229, 0.224, 0.225])
+
 	## Optimizer and LR scheduler
-	criterion = nn.CrossEntropyLoss().cuda()
+	criterion = nn.CrossEntropyLoss()
+	if not colab:
+		criterion = nn.CrossEntropyLoss().cuda()
 	optimizer = optim.SGD(model.parameters(), lr=args.lr,
 					  momentum=args.momentum, weight_decay=args.weight_decay, nesterov=True)
 
