@@ -13,6 +13,7 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import resnet
 
+
 model_names = sorted(name for name in resnet.__dict__
 	if name.islower() and not name.startswith("__")
 					 and name.startswith("resnet")
@@ -67,6 +68,8 @@ def main():
 		os.makedirs(args.save_dir)
 
 	model = torch.nn.DataParallel(resnet.__dict__[args.arch]())
+	if args.snip:
+
 	if not args.colab:
 		model.cuda()
 

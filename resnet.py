@@ -98,6 +98,9 @@ class ResNet(nn.Module):
 def resnet20():
     return ResNet(BasicBlock, [3, 3, 3])
 
+def resnet56_snip():
+    return ResNet(BasicBlock, [9,9,9], init_strat="xavier")
+
 
 def resnet32():
     return ResNet(BasicBlock, [5, 5, 5])
