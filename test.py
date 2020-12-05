@@ -21,7 +21,7 @@ import resnet
 parser = argparse.ArgumentParser(description='ResNet56 pruning experiment testing properties')
 parser.add_argument('--model_dir', type=str,  default='trained_models', help='directory of trained models. Should all be of same model type')
 parser.add_argument('--arch', type=str, default="resnet56", help="model type to load pretrained weights into")
-parser.add_argument('--log_dir', type=str, default="accuracy_logs.txt", help='directory to save accuracy logs from pretrained models')
+parser.add_argument('--log_dir', type=str, default="accuracy_logs.json", help='directory to save accuracy logs from pretrained models')
 args = parser.parse_args()
 
 def main():
@@ -40,7 +40,7 @@ def main():
 	# model = None
 	# if args.model_dir == "resnet56":
 	# 	model = resnet.resnet56()
-	model = resnet.ResNet(BasicBlock, [9, 9, 9])
+	model = resnet.resnet56()
 	model = model.to(device)
 
 	#save files need the format <pruning style><compression rate in 3 numbers>.pth for example SNIP010.pth for SNIP style pruning to 10% weight retention
@@ -51,12 +51,12 @@ def main():
 
 	#collect accuracies
 	accuracies = []
-	for model in model_names:
+	for prune_style in model_names:
 		
-		filename = args.model_dir + os.sep + model + ".th"
+		filename = args.model_dir + os.sep + prune_style + ".th"
 		print("Testing Model: {} from {}".format(model, filename))
 		pretrained = torch.load(filename)
-		model.load_state_dict(pretrained['state_dict'])
+		model.load_state_dict(pretrained, strict=False)
 		model.eval()
 		test_loss = 0
 		correct = 0
@@ -79,11 +79,11 @@ def main():
 
 	#write to json file.
 	output_json = {}
-	for i,model in enumarate(model_names):
-		prune_style = model[:-3]
+	for i,model_name in enumarate(model_names):
+		prune_style = model_name[:-3]
 		if not (prune_style in output_json):
 			output_json[prune_style] = {}
-		output_json[prune_style]['compression' + model[-3:]] = {'accuracy': accuracies[i]}
+		output_json[prune_style]['compression' + model_name[-3:]] = {'accuracy': accuracies[i]}
 
 	with open(args.log_dir, 'w') as output:
 		json.dump(output_json, output, indent=1)
