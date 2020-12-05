@@ -1,0 +1,18 @@
+{
+ "Rewind": {
+  "compression010": {
+   "accuracy": 91
+  },
+  "compression020": {
+   "accuracy": 82
+  }
+ },
+ "SNIP": {
+  "compression010": {
+   "accuracy": 100
+  },
+  "compression020": {
+   "accuracy": 76
+  }
+ }
+}
