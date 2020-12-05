@@ -11,6 +11,7 @@ import torchvision.datasets as datasets
 
 import torchvision
 import torchvision.transforms as transforms
+from sklearn.metrics import accuracy_score
 
 import os
 import json
@@ -47,39 +48,38 @@ def main():
 	model_names = []
 	with os.scandir(args.model_dir) as folder:
 		for file in folder:
-			model_names = file.name[:-3]
+			model_names.append(file.name[:-3])
 
 	#collect accuracies
 	accuracies = []
 	for prune_style in model_names:
 		
 		filename = args.model_dir + os.sep + prune_style + ".th"
-		print("Testing Model: {} from {}".format(model, filename))
+		print("Testing Model: {} from {}".format(prune_style, filename))
 		pretrained = torch.load(filename)
 		model.load_state_dict(pretrained, strict=False)
 		model.eval()
 		test_loss = 0
 		correct = 0
 		total = 0
+		batch_count = 0
 		with torch.no_grad():
-			for batch_idx, (inputs, targets) in enumerate(testloader):
+			for batch_idx, (inputs, targets) in enumerate(test_loader):
 				inputs, targets = inputs.to(device), targets.to(device)
-				outputs = net(inputs)
-				criterion = nn.CrossEntropyLoss()
-				loss = criterion(outputs, targets)
-
-				test_loss += loss.item()
+				outputs = model(inputs)
 				_, predicted = outputs.max(1)
+				accuracy += accuracy_score(targets, predicted)
+				batch_count += 1
 				total += targets.size(0) 
 				correct += predicted.eq(targets).sum().item()
 		
-		acc = 100.*correct/total
+		acc = accuracy / batch_count
 		accuracies.append(acc)
 		print("    Accuracy: {}%".format(acc))
 
 	#write to json file.
 	output_json = {}
-	for i,model_name in enumarate(model_names):
+	for i,model_name in enumerate(model_names):
 		prune_style = model_name[:-3]
 		if not (prune_style in output_json):
 			output_json[prune_style] = {}
