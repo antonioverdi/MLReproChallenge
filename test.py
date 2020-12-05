@@ -35,10 +35,12 @@ def main():
 		batch_size=128, shuffle=False,
 		num_workers=0)
 
-	model = None
-	if args.model_dir == "resnet56":
-		model = resnet.resnet56()
-
+	
+	##Not sure why this bit of code didn't create a ResNet model but no time examine. Let the hardcoding begin :D
+	# model = None
+	# if args.model_dir == "resnet56":
+	# 	model = resnet.resnet56()
+	model = resnet.ResNet(BasicBlock, [9, 9, 9])
 	model = model.to(device)
 
 	#save files need the format <pruning style><compression rate in 3 numbers>.pth for example SNIP010.pth for SNIP style pruning to 10% weight retention
@@ -50,8 +52,11 @@ def main():
 	#collect accuracies
 	accuracies = []
 	for model in model_names:
-		print("Testing Model: {}".format(model))
-		model.load_state_dict(torch.load(args.model_dir + os.sep + model + ".th"))
+		
+		filename = args.model_dir + os.sep + model + ".th"
+		print("Testing Model: {} from {}".format(model, filename))
+		pretrained = torch.load(filename)
+		model.load_state_dict(pretrained['state_dict'])
 		model.eval()
 		test_loss = 0
 		correct = 0
