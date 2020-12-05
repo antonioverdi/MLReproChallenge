@@ -5,6 +5,9 @@ import torch.optim as optim
 import torch.nn.functional as F
 import torch.backends.cudnn as cudnn
 from torchsummary import summary
+import torch.utils.data
+import torchvision.transforms as transforms
+import torchvision.datasets as datasets
 
 import torchvision
 import torchvision.transforms as transforms
@@ -47,6 +50,7 @@ def main():
 	#collect accuracies
 	accuracies = []
 	for model in model_names:
+		print("Testing Model: {}".format(model))
 		model.load_state_dict(torch.load(args.model_dir + os.sep + model + ".th"))
 		model.eval()
 		test_loss = 0
@@ -66,6 +70,7 @@ def main():
 		
 		acc = 100.*correct/total
 		accuracies.append(acc)
+		print("    Accuracy: {}%".format(acc))
 
 	#write to json file.
 	output_json = {}
@@ -79,6 +84,5 @@ def main():
 		json.dump(output_json, output, indent=1)
 
 
-
-
-
+if __name__ == '__main__':
+	main()
