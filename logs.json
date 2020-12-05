@@ -1,7 +1,7 @@
 {
  "Rewind": {
   "compression010": {
-   "accuracy": 91
+   "accuracy": 80
   },
   "compression020": {
    "accuracy": 82
@@ -9,7 +9,7 @@
  },
  "SNIP": {
   "compression010": {
-   "accuracy": 100
+   "accuracy": 75
   },
   "compression020": {
    "accuracy": 76

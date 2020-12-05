@@ -55,7 +55,7 @@ parser.add_argument('--save-dir', dest='save_dir',
 parser.add_argument('--save-every', dest='save_every',
 					help='Saves checkpoints at every specified number of epochs',
 					type=int, default=10)
-parser.add_argument('--colab', action="store_true", help="set true to avoid moving model to Cuda")
+parser.add_argument('--cpu', action="store_true", help="set true to avoid moving model to Cuda")
 parser.add_argument('--snip', action="store_true", help="will run SNIP experiments")
 parser.add_argument('--snip_compression', type=float, default=0.5, help="eg. a value of 0.25 will retain 25 percent of the weights")
 best_prec1 = 0
@@ -85,7 +85,7 @@ def main():
 			normalize,
 		]), download=True),
 		batch_size=args.batch_size, shuffle=True,
-		num_workers=args.workers, pin_memory=(not args.colab))
+		num_workers=args.workers, pin_memory=(not args.cpu))
 
 	val_loader = torch.utils.data.DataLoader(
 		datasets.CIFAR10(root='./data', train=False, transform=transforms.Compose([
@@ -93,9 +93,9 @@ def main():
 			normalize,
 		])),
 		batch_size=128, shuffle=False,
-		num_workers=args.workers, pin_memory=(not args.colab))
+		num_workers=args.workers, pin_memory=(not args.cpu))
 
-	if not args.colab:
+	if not args.cpu:
 		model.cuda()
 
 	if args.snip and (args.resume == ''):
@@ -104,8 +104,8 @@ def main():
 		labels = labels.cuda()
 		mask = snip_mask(model, batch, labels, args.snip_compression)
 		apply_snip(model, mask)
-		print("Model SNIP applied, displaying first layer for sanity check")
-		print(next(model.parameters()))
+		print("Model SNIP applied")
+		# print(next(model.parameters())) #sanity check
 
 
 
@@ -122,12 +122,12 @@ def main():
 		else:
 			print("=> no checkpoint found at '{}'".format(args.resume))
 
-	# if not args.colab:
+	# if not args.cpu:
 	cudnn.benchmark = True
 
 	## Optimizer and LR scheduler
 	criterion = nn.CrossEntropyLoss()
-	if not args.colab:
+	if not args.cpu:
 		criterion = nn.CrossEntropyLoss().cuda()
 	optimizer = optim.SGD(model.parameters(), lr=args.lr,
 					  momentum=args.momentum, weight_decay=args.weight_decay, nesterov=True)
@@ -146,7 +146,7 @@ def main():
 
 
 	if args.evaluate:
-		validate(val_loader, model, criterion, args.colab)
+		validate(val_loader, model, criterion, args.cpu)
 		return
 
 	for epoch in range(args.start_epoch, args.epochs):
@@ -154,11 +154,11 @@ def main():
 		# train for one epoch
 		print('current lr {:.5e}'.format(optimizer.param_groups[0]['lr']))
 		begin_time = time.time()
-		train(train_loader, model, criterion, optimizer, epoch, args.colab)
+		train(train_loader, model, criterion, optimizer, epoch, args.cpu)
 		lr_scheduler.step()
 
 		# evaluate on validation set
-		prec1 = validate(val_loader, model, criterion, args.colab)
+		prec1 = validate(val_loader, model, criterion, args.cpu)
 
 		# remember best prec@1 and save checkpoint
 		is_best = prec1 > best_prec1
@@ -179,7 +179,7 @@ def main():
 		print("Epoch Total Time: {:.3f}".format(time.time() - begin_time))
 
 
-def train(train_loader, model, criterion, optimizer, epoch, colab=False):
+def train(train_loader, model, criterion, optimizer, epoch, cpu=False):
 	"""
 		Run one train epoch
 	"""
@@ -198,7 +198,7 @@ def train(train_loader, model, criterion, optimizer, epoch, colab=False):
 		data_time.update(time.time() - end)
 
 
-		if colab:
+		if cpu:
 			input_var = input
 		else:
 			target = target.cuda()
@@ -238,7 +238,7 @@ def train(train_loader, model, criterion, optimizer, epoch, colab=False):
 					  data_time=data_time, loss=losses, top1=top1))
 
 
-def validate(val_loader, model, criterion, colab=False):
+def validate(val_loader, model, criterion, cpu=False):
 	"""
 	Run evaluation
 	"""
@@ -252,7 +252,7 @@ def validate(val_loader, model, criterion, colab=False):
 	end = time.time()
 	with torch.no_grad():
 		for i, (input, target) in enumerate(val_loader):
-			if not colab:
+			if not cpu:
 				target = target.cuda()
 				input_var = input.cuda()
 				target_var = target.cuda()
