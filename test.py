@@ -68,8 +68,10 @@ def main():
 				inputs, targets = inputs.to(device), targets.to(device)
 				outputs = model(inputs)
 				_, predicted = outputs.max(1)
+
 				accuracy += accuracy_score(targets, predicted)
 				batch_count += 1
+				
 				total += targets.size(0) 
 				correct += predicted.eq(targets).sum().item()
 		
