@@ -14,8 +14,20 @@ import argparse
 
 from models import *
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-print(device)
+parser = argparse.ArgumentParser(description='ResNet56 pruning experiment testing properties')
+parser.add_argument('--model_dir', type=str,  default='trained_models', help='directory of trained models. Should all be of same model type')
+parser.add_argument('--arch', type=str, default="resnet56", help="model type to load pretrained weights into")
+parser.add_argument('--log_dir', type=str, default="accuracy_logs", help='directory to save accuracy logs from pretrained models')
+args = parser.parse_args()
+
+def main():
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    print(device)
+
+    test_loader = torch.utils.data.DataLoader(
+        datasets.CIFAR10(root='./data', train=False, transform=normalize, download=True),
+        batch_size=args.batch_size, shuffle=False,
+        num_workers=args.workers, pin_memory=True)
 
 print('==> Preparing data..')
 transform_train = transforms.Compose([

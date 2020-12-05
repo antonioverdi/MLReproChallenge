@@ -20,7 +20,7 @@ model_names = sorted(name for name in resnet.__dict__
 					 and name.startswith("resnet")
 					 and callable(resnet.__dict__[name]))
 
-parser = argparse.ArgumentParser(description='Propert ResNets for CIFAR10 in pytorch')
+parser = argparse.ArgumentParser(description='ResNet56 pruning experiment properties')
 parser.add_argument('--arch', '-a', metavar='ARCH', default='resnet56',
 					choices=model_names,
 					help='model architecture: ' + ' | '.join(model_names) +
