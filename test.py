@@ -42,12 +42,12 @@ def main():
 	model_names = []
 	with os.scandir(args.model_dir) as folder:
 		for file in folder:
-			model_names = file.name[:-4]
+			model_names = file.name[:-3]
 
 	#collect accuracies
 	accuracies = []
 	for model in model_names:
-		model.load_state_dict(torch.load(args.model_dir + os.sep + model + ".pth"))
+		model.load_state_dict(torch.load(args.model_dir + os.sep + model + ".th"))
 		model.eval()
 		test_loss = 0
 		correct = 0
