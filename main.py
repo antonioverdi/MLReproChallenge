@@ -104,6 +104,9 @@ def main():
 		labels = labels.cuda()
 		mask = snip_mask(model, batch, labels, args.snip_compression)
 		apply_snip(model, mask)
+		print("Model SNIP applied, displaying first layer for sanity check")
+		print(next(model.parameters()))
+
 
 
 	# optionally resume from a checkpoint.
@@ -173,7 +176,7 @@ def main():
 			'state_dict': model.state_dict(),
 			'best_prec1': best_prec1,
 			}, filename=os.path.join(args.save_dir, 'model.th'))
-		print("Epoch Total Time: {}".format(time.time() - begin_time))
+		print("Epoch Total Time: {:.3f}".format(time.time() - begin_time))
 
 
 def train(train_loader, model, criterion, optimizer, epoch, colab=False):
