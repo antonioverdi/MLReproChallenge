@@ -1,19 +1,19 @@
 {
  "SNIP": {
   "compression010": {
-   "accuracy": 10.0
+   "accuracy": 90.2
   },
   "compression020": {
-   "accuracy": 10.0
+   "accuracy": 91.0
   },
   "compression040": {
-   "accuracy": 10.0
+   "accuracy": 92.7
   },
   "compression080": {
-   "accuracy": 10.0
+   "accuracy": 93.0
   },
   "compression100": {
-   "accuracy": 10.0
+   "accuracy": 0.0
   }
  }
 }

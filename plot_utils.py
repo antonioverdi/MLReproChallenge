@@ -14,7 +14,7 @@ def create_individual_plots(filepath, compression_list):
 		plt.figure(figsize=(16,4))
 		plt.suptitle(k + " Compression")
 		plt.subplot(121)
-		plt.ylim(0,100)
+		plt.ylim(50,100)
 		plt.plot(x, accuracies[k])
 		plt.xticks(x, x_ticks)
 		plt.xlabel("Percent of Weights Retained")
@@ -38,7 +38,7 @@ def create_comparison_plots(filepath, compression_list):
 		plt.figure(figsize=(16,4))
 		plt.suptitle("Comparison of Pruning Techniques")	
 		plt.subplot(121)
-		plt.ylim(0,100)
+		plt.ylim(50,100)
 		for k in keys:
 			plt.plot(x, accuracies[k], label=k)
 		plt.xticks(x, x_ticks)
@@ -52,7 +52,7 @@ def create_comparison_plots(filepath, compression_list):
 			plt.plot(x, change, 'o--', label=k)
 		plt.xticks(x, x_ticks)
 		plt.ylim(-3,1)
-		plt.yticks([-3, -2, -1, 0, 1], ["-3%", "-2%", "-1%", "0%", "1%"])
+		plt.yticks(np.arange(-5,6), list(map(_add_percent, np.arange(-5,6))))
 		plt.xlabel("Percent of Weights Retained")
 		plt.ylabel("Change in Accuracy")	
 		plt.legend()		
@@ -64,7 +64,10 @@ def _add_percent(n):
 	return str(n) + "%"
 
 def _get_acc_change(accuracies):
-	unpruned_acc = accuracies[0]
+	first_ind = accuracies.index(next(filter(lambda x: x!=0, accuracies)))
+	if first_ind != 0:
+		print("Note that graphs are missing results from first {} compression ratios".format(first_ind))
+	unpruned_acc = accuracies[first_ind]
 	acc_change = [x - unpruned_acc for x in accuracies]
 	return acc_change
 
