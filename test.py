@@ -4,7 +4,6 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import torch.backends.cudnn as cudnn
-from torchsummary import summary
 import torch.utils.data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
@@ -40,8 +39,8 @@ def main():
 	# model = None
 	# if args.model_dir == "resnet56":
 	# 	model = resnet.resnet56()
-	model = resnet.resnet56()
-	model = model.to(device)
+	# model = resnet.resnet56_snip()
+	# model = model.to(device)
 
 	#save files need the format <pruning style><compression rate in 3 numbers>.pth for example SNIP010.pth for SNIP style pruning to 10% weight retention
 	model_names = []
@@ -52,11 +51,11 @@ def main():
 	#collect accuracies
 	accuracies = []
 	for prune_style in model_names:
-		
+		model = resnet.resnet56() #hardcoding grossness
 		filename = args.model_dir + os.sep + prune_style + ".th"
 		print("Testing Model: {} from {}".format(prune_style, filename))
-		pretrained = torch.load(filename)
-		model.load_state_dict(pretrained, strict=False)
+		pretrained = torch.load(filename, map_location=torch.device(device))
+		model.load_state_dict(pretrained)
 		model.eval()
 		model.to(device)
 		test_loss = 0
