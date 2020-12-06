@@ -34,9 +34,10 @@ def main():
 		batch_size=128, shuffle=False,
 		num_workers=0)
 
-	
-	model = torch.nn.DataParallel(resnet.__dict__[args.arch]())
-	model.to(device)
+	mask_loader = torch.utils.data.DataLoader(
+		datasets.CIFAR10(root='./data', train=False, transform=transform_test, download=True),
+		batch_size=128, shuffle=False,
+		num_workers=0)
 
 	#save files need the format <pruning style><compression rate in 3 numbers>.pth for example SNIP010.pth for SNIP style pruning to 10% weight retention
 	model_names = []
@@ -47,6 +48,15 @@ def main():
 	#collect accuracies
 	accuracies = []
 	for prune_style in model_names:
+		model = torch.nn.DataParallel(resnet.__dict__[args.arch]())
+		model.to(device)
+
+		#some nonsense needed for weight loading since I forgot to remove the weight masks before saving the torch models
+		if prune_style[0:4] == "SNIP": 
+			for layer in model.modules():
+				if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
+					layer.weight_mask = nn.Parameter(torch.ones_like(layer.weight)) 
+	
 		filename = args.model_dir + os.sep + prune_style + ".th"
 		print("Testing Model: {} from {}".format(prune_style, filename))
 		pretrained = torch.load(filename, map_location=torch.device(device))
