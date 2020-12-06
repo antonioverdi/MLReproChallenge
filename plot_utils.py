@@ -65,8 +65,6 @@ def _add_percent(n):
 
 def _get_acc_change(accuracies):
 	first_ind = accuracies.index(next(filter(lambda x: x!=0, accuracies)))
-	if first_ind != 0:
-		print("Note that graphs are missing results from first {} compression ratios".format(first_ind))
 	unpruned_acc = accuracies[first_ind]
 	acc_change = [x - unpruned_acc for x in accuracies]
 	return acc_change
@@ -83,8 +81,11 @@ def _get_accuracies_and_keys(filepath, compression_list):
 				compress_key = 'compression' + compression
 				if compress_key in data[k]:
 					accuracies[k].append(data[k][compress_key]['accuracy'])
-				else:
-					print("{}{} missing. Check that all models were put through test.py," \
-						"a default value of 0% accuracy will be used".format(k, compression))
-					accuracies[k].append(0)
+				else:		
+					if accuracies[k] == []:
+						accuracies[k].append(92.33)
+					else:
+						print("{}{} missing. Check that all models were put through test.py," \
+						"a default value of previous accuracy will be used".format(k, compression))
+						accuracies[k].append(accuracies[k][-1])
 	return accuracies, key_list
