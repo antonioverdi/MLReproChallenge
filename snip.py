@@ -35,7 +35,7 @@ def snip_mask(model, batch, labels, compression):
 	absolute_saliency = []
 	for layer in model.modules():
 		if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
-			absolute_saliency.append(torch.abs(layer.weight_mask.grad))
+			absolute_saliency.append(torch.abs(layer.weight.grad))
 			
 	saliency_scores = torch.cat([torch.flatten(x) for x in absolute_saliency])
 	denominator = torch.sum(saliency_scores)
