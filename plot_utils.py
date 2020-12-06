@@ -14,7 +14,7 @@ def create_individual_plots(filepath, compression_list):
 		plt.figure(figsize=(16,4))
 		plt.suptitle(k + " Compression")
 		plt.subplot(121)
-		plt.ylim(50,100)
+		plt.ylim(70,100)
 		plt.plot(x, accuracies[k])
 		plt.xticks(x, x_ticks)
 		plt.xlabel("Percent of Weights Retained")
@@ -38,7 +38,7 @@ def create_comparison_plots(filepath, compression_list):
 		plt.figure(figsize=(16,4))
 		plt.suptitle("Comparison of Pruning Techniques")	
 		plt.subplot(121)
-		plt.ylim(50,100)
+		plt.ylim(70,100)
 		for k in keys:
 			plt.plot(x, accuracies[k], label=k)
 		plt.xticks(x, x_ticks)
