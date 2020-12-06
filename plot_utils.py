@@ -49,7 +49,7 @@ def create_comparison_plots(filepath, compression_list):
 		plt.grid(True)
 		for k in keys:
 			change = _get_acc_change(accuracies[k])
-			plt.plot(x, change, label=k)
+			plt.plot(x, change, 'o--', label=k)
 		plt.xticks(x, x_ticks)
 		plt.ylim(-3,1)
 		plt.yticks([-3, -2, -1, 0, 1], ["-3%", "-2%", "-1%", "0%", "1%"])
@@ -77,5 +77,11 @@ def _get_accuracies_and_keys(filepath, compression_list):
 		for k in key_list:
 			accuracies[k] = []
 			for compression in compression_list:
-				accuracies[k].append(data[k]['compression' + compression]['accuracy'])
+				compress_key = 'compression' + compression
+				if compress_key in data[k]:
+					accuracies[k].append(data[k][compress_key]['accuracy'])
+				else:
+					print("{}{} missing. Check that all models were put through test.py," \
+						"a default value of 0% accuracy will be used".format(k, compression))
+					accuracies[k].append(0)
 	return accuracies, key_list

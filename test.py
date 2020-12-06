@@ -27,7 +27,6 @@ args = parser.parse_args()
 
 def main():
 	device = 'cuda' if torch.cuda.is_available() else 'cpu'
-	print(device)
 
 	transform_test = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
@@ -59,6 +58,7 @@ def main():
 		pretrained = torch.load(filename)
 		model.load_state_dict(pretrained, strict=False)
 		model.eval()
+		model.to(device)
 		test_loss = 0
 		correct = 0
 		total = 0
@@ -84,6 +84,7 @@ def main():
 
 	with open(args.log_dir, 'w') as output:
 		json.dump(output_json, output, indent=1)
+	print("Testing complete, results saved to {}".format(args.log_dir))
 
 
 if __name__ == '__main__':
