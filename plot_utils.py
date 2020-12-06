@@ -23,8 +23,8 @@ def create_individual_plots(filepath, compression_list):
 		plt.grid(True)
 		plt.plot(x, change, 'ob--')
 		plt.xticks(x, x_ticks)
-		plt.ylim(-3,1)
-		plt.yticks([-3, -2, -1, 0, 1], ["-3%", "-2%", "-1%", "0%", "1%"])
+		plt.ylim(-5,5)
+		plt.yticks(np.arange(-5,6), list(map(_add_percent, np.arange(-5,6))))
 		plt.xlabel("Percent of Weights Retained")
 		plt.ylabel("Change in Accuracy")
 

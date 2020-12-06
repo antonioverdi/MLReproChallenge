@@ -34,11 +34,6 @@ def main():
 		batch_size=128, shuffle=False,
 		num_workers=0)
 
-	mask_loader = torch.utils.data.DataLoader(
-		datasets.CIFAR10(root='./data', train=False, transform=transform_test, download=True),
-		batch_size=128, shuffle=False,
-		num_workers=0)
-
 	#save files need the format <pruning style><compression rate in 3 numbers>.pth for example SNIP010.pth for SNIP style pruning to 10% weight retention
 	model_names = []
 	with os.scandir(args.model_dir) as folder:
@@ -63,7 +58,6 @@ def main():
 		model.load_state_dict(pretrained['state_dict'])
 		model.eval()
 		model.to(device)
-		print("Model load successful, running on testing set...")
 		test_loss = 0
 		correct = 0
 		total = 0
@@ -77,7 +71,7 @@ def main():
 		
 		acc = 100. * correct / total
 		accuracies.append(acc)
-		print("    Accuracy: {}%".format(acc))
+		print("    Accuracy: {}%\n".format(acc))
 
 	#write to json file.
 	output_json = {}
