@@ -9,6 +9,9 @@ This repository contains all of the code used to replicate the results of the IC
 
 [___"Comparing Rewinding and Fine-Tuning in Neural Network Pruning"___](https://arxiv.org/pdf/2003.02389.pdf)
 
+It also includes code for unstructured sensitivity based pruning from:
+[___"SNIP: Single-Shot Network Pruning Based on Connection Sensitivity"___](https://arxiv.org/pdf/1810.02340.pdf)
+
 ## Requirements/Setup
 
 ## Instructions for Running Code
