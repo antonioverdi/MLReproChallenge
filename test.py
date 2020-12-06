@@ -35,12 +35,8 @@ def main():
 		num_workers=0)
 
 	
-	##Not sure why this bit of code didn't create a ResNet model but no time examine. Let the hardcoding begin :D
-	# model = None
-	# if args.model_dir == "resnet56":
-	# 	model = resnet.resnet56()
-	# model = resnet.resnet56_snip()
-	# model = model.to(device)
+	model = torch.nn.DataParallel(resnet.__dict__[args.arch]())
+	model.to(device)
 
 	#save files need the format <pruning style><compression rate in 3 numbers>.pth for example SNIP010.pth for SNIP style pruning to 10% weight retention
 	model_names = []
@@ -51,13 +47,13 @@ def main():
 	#collect accuracies
 	accuracies = []
 	for prune_style in model_names:
-		model = resnet.resnet56() #hardcoding grossness
 		filename = args.model_dir + os.sep + prune_style + ".th"
 		print("Testing Model: {} from {}".format(prune_style, filename))
 		pretrained = torch.load(filename, map_location=torch.device(device))
-		model.load_state_dict(pretrained)
+		model.load_state_dict(pretrained['state_dict'])
 		model.eval()
 		model.to(device)
+		print("Model load successful, running on testing set...")
 		test_loss = 0
 		correct = 0
 		total = 0
