@@ -36,7 +36,7 @@ def create_comparison_plots(filepath, compression_list):
 		x = np.arange(len(x_ticks))
 
 		plt.figure(figsize=(16,4))
-		plt.suptitle("Comparison of {}".format(keys))	
+		plt.suptitle("Comparison of Pruning Techniques")	
 		plt.subplot(121)
 		plt.ylim(0,100)
 		for k in keys:
