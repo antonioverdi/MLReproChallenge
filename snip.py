@@ -16,7 +16,7 @@ def snip_mask(model, batch, labels, compression):
 		#create pruning masks manually
 		if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
 			layer.weight_mask = nn.Parameter(torch.ones_like(layer.weight)) 
-            layer.weight_mask.requires_grad = False
+			layer.weight_mask.requires_grad = False
 
 		#monkey-patch forward methods
 		if isinstance(layer, nn.Conv2d):
