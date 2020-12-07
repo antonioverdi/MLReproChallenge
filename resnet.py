@@ -1,4 +1,6 @@
-''' Yerlan Idelbayev. '''
+''' Code started from
+https://github.com/akamaster/pytorch_resnet_cifar10 by Yerlan Idelbayev.
+ '''
 
 import torch
 import torch.nn as nn

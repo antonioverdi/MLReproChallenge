@@ -1,3 +1,8 @@
+''' Code started from
+https://github.com/mil-ad/snip/blob/master/snip.py
+'''
+
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

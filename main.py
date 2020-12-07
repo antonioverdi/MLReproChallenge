@@ -1,3 +1,8 @@
+''' code started from
+https://github.com/lottery-ticket/rewinding-iclr20-public
+by author's of the paper
+'''
+
 import argparse
 import os
 import shutil
