@@ -1,19 +1,53 @@
 {
+ "Learn Rate Rewind": {
+  "compression010": {
+   "accuracy": 92.95
+  },
+  "compression060": {
+   "accuracy": 93.2
+  },
+  "compression020": {
+   "accuracy": 93.07
+  },
+  "compression080": {
+   "accuracy": 93.4
+  },
+  "compression040": {
+   "accuracy": 93.25
+  }
+ },
+ "Finetune": {
+  "compression040": {
+   "accuracy": 92.17
+  },
+  "compression020": {
+   "accuracy": 91.05
+  },
+  "compression060": {
+   "accuracy": 92.11
+  },
+  "compression010": {
+   "accuracy": 89.7
+  },
+  "compression080": {
+   "accuracy": 92.28
+  }
+ },
  "SNIP": {
   "compression040": {
    "accuracy": 91.75
   },
-  "compression020": {
-   "accuracy": 90.15
+  "compression060": {
+   "accuracy": 92.58
   },
-  "compression100": {
-   "accuracy": 89.58
+  "compression010": {
+   "accuracy": 88.49
   },
   "compression080": {
    "accuracy": 92.1
   },
-  "compression010": {
-   "accuracy": 88.49
+  "compression020": {
+   "accuracy": 90.15
   }
  }
 }
